@@ -20,13 +20,16 @@ export const addMenuItem = async (req, res) => {
             description,            
             picturePath,            
             price,
+            category,
         } = req.body;
-
+        console.log(picturePath, "<<<<<<");
+        console.log(picturePath[1], "<<<<<<");
         const newMenuItem = new MenuItem({
             name,
             description,            
-            picturePath,            
+            picturePath: picturePath[1],            
             price,
+            category
         });
         const savedMenuItem = await newMenuItem.save();
         res.status(201).json(savedMenuItem);

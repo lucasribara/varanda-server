@@ -22,8 +22,6 @@ export const addMenuItem = async (req, res) => {
             price,
             category,
         } = req.body;
-        console.log(picturePath, "<<<<<<");
-        console.log(picturePath[1], "<<<<<<");
         const newMenuItem = new MenuItem({
             name,
             description,            
@@ -37,3 +35,25 @@ export const addMenuItem = async (req, res) => {
         res.status(500).json({ error: e.message })
     }
 }
+
+export const deleteMenuItem = (req, res) => {
+    const id = req.params.id;
+  
+    MenuItem.findByIdAndDelete(id)
+      .then(data => {
+        if (!data) {
+          res.status(404).send({
+            message: `Cannot delete Item with id=${id}. Maybe Item was not found!`
+          });
+        } else {
+          res.send({
+            message: "Item was deleted successfully!"
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete Item with id=" + id
+        });
+      });
+  };

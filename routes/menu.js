@@ -1,5 +1,6 @@
 import express from "express";
 import { getMenu, deleteMenuItem } from "../controllers/menu.js";
+import { verifyAdminToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -7,6 +8,6 @@ const router = express.Router();
 router.get("/", getMenu);
 
 // Delete 
-router.delete("/:id", deleteMenuItem);
+router.delete("/:id", verifyAdminToken, deleteMenuItem);
 
 export default router;

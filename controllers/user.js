@@ -9,23 +9,20 @@ export const register = async (req, res) => {
             lastName,
             email,
             password,
-            orders,
-            role,
             homeNumber,
         } = req.body;
-
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
-        if(role !== "admin" && role !== "customer") 
-            return res.status(400).json({ message: "Invalid role for user" })
+        // if(role !== "admin" && role !== "customer") 
+        //     return res.status(400).json({ message: "Invalid role for user" })
         
         const newUser = new User({
             firstName,
             lastName,
             email,
             password: passwordHash,
-            orders,
-            role,
+            orders: [],
+            role: "customer",
             homeNumber,
         });
         const savedUser = await newUser.save();

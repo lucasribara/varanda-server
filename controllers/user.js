@@ -9,6 +9,7 @@ export const register = async (req, res) => {
             lastName,
             email,
             password,
+            phoneNumber,
             homeNumber,
         } = req.body;
         const salt = await bcrypt.genSalt();
@@ -23,6 +24,7 @@ export const register = async (req, res) => {
             password: passwordHash,
             orders: [],
             role: "customer",
+            phoneNumber,
             homeNumber,
         });
         const savedUser = await newUser.save();

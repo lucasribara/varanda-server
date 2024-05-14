@@ -9,7 +9,9 @@ import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 import menuRoutes from "./routes/menu.js";
+import userRoutes from "./routes/users.js";
 import { addMenuItem } from "./controllers/menu.js";
+import { verifyAdminToken } from "./middleware/auth.js";
 
 //configs
 const __filename = fileURLToPath(import.meta.url);
@@ -37,9 +39,10 @@ const storage = multer.diskStorage({
 const upload = multer({storage});
 
 //routes with files
-app.post("/menu/add", upload.single("picture"), addMenuItem);
+app.post("/menu/add", verifyAdminToken, upload.single("picture"), addMenuItem);
 
 //routes
+app.use("/user", userRoutes)
 app.use("/menu", menuRoutes);
 
 //mongoose setup

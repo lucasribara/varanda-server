@@ -53,3 +53,31 @@ export const login = async (req, res) => {
         res.status(500).json({error: e.message});
     }
 }
+
+export const update = async (req, res) => {
+    try {
+        if (!req.body) {
+            return res.status(400).send({
+              message: "Informação para atualizar não pode ser vazia."
+            });
+          }
+        
+          const id = req.params.id;
+        
+          User.findByIdAndUpdate(id, req.body, { useFindAndModify: false, new: true })
+            .then(data => {
+              if (!data) {
+                res.status(404).send({
+                  message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found!`
+                });
+              } else res.status(201).json(data);
+            })
+            .catch(err => {
+              res.status(500).send({
+                message: "Error updating Tutorial with id=" + id
+              });
+            });
+    } catch (e) {
+        res.status(500).json({error: e.message});
+    }    
+}

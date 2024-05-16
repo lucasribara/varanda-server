@@ -68,13 +68,13 @@ export const update = async (req, res) => {
             .then(data => {
               if (!data) {
                 res.status(404).send({
-                  message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found!`
+                  message: `Usuario não foi encontrado`
                 });
               } else res.status(201).json(data);
             })
             .catch(err => {
               res.status(500).send({
-                message: "Error updating Tutorial with id=" + id
+                message: "Erro ao atualizar usuario"
               });
             });
     } catch (e) {

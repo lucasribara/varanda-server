@@ -10,6 +10,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import menuRoutes from "./routes/menu.js";
 import userRoutes from "./routes/users.js";
+import orderRoutes from "./routes/orders.js";
 import { addMenuItem } from "./controllers/menu.js";
 import { verifyAdminToken } from "./middleware/auth.js";
 
@@ -44,6 +45,7 @@ app.post("/menu/add", verifyAdminToken, upload.single("picture"), addMenuItem);
 //routes
 app.use("/user", userRoutes)
 app.use("/menu", menuRoutes);
+app.use("/order", orderRoutes);
 
 //mongoose setup
 const PORT = process.env.PORT || 6001;

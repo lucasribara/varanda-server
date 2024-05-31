@@ -2,19 +2,11 @@ import Order from "../models/Order.js"
 import MenuItem from "../models/MenuItem.js";
 import mongoose from "mongoose";
 import { setOrderState } from "../helpers/orderStates.js";
+import { getUserIdFromToken } from "../middleware/auth.js";
 
-export const getTodayOrders = async (req, res) => {
-    try {
-        let getToday = {}
-        const beginningOfDay = new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()
-        const endingOfDay = new Date(new Date().setUTCHours(23, 59, 59, 999)).toISOString()
-
-        getToday.createdAt = {
-            $gte: beginningOfDay,
-            $lte: endingOfDay
-        }
-
-        const ordersWithUserDetails = await Order.find(getToday)           
+export const getWorkingOrders = async (req, res) => {
+    try {       
+        const ordersWithUserDetails = await Order.find({'state.code': { $ne: 5 }})
             .populate('user')
             .exec();
 
@@ -25,14 +17,33 @@ export const getTodayOrders = async (req, res) => {
     }
 }
 
+export const getUserOrders = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        // let token = req.header("Authorization");
+        // console.log(userId, " ==== ", getUserIdFromToken(token));
+        // if(userId != getUserIdFromToken(token)) {
+        //     return res.status(403).json({message: "Você não tem permissão para essa ação"});
+        // }
+
+        const orders = await Order.find({ user: userId }).sort('-createdAt');
+        res.status(200).json(orders);
+        
+    } catch (e) {
+        res.status(500).json({ error: e.message })
+    }
+}
+
 export const createOrder = async (req, res) => {
     try {
         const {
             user,
             items,
+            comment
         } = req.body;
 
         const menu = await MenuItem.find();
+        
         const totalPrice = getTotalOrderPrice(items, menu);
         if(!totalPrice) {
             return res.status(400).json({message: "Ocorreu um erro ao processar seu pedido"});
@@ -42,10 +53,13 @@ export const createOrder = async (req, res) => {
             price: totalPrice,
             state: setOrderState(1),
             items,
+            comment
         });
+        console.log(newOrder);
         const savedOrder = await newOrder.save();
         res.status(201).json(savedOrder);
     } catch (e) {
+        console.log(e);
         res.status(500).json({ error: e.message })
     }
 }
@@ -54,7 +68,8 @@ export const updateStatus = async (req, res) => {
     const {
         code
     } = req.body;
-
+    console.log(req.body);
+    setOrderState(code)
     const orderId = req.params.id;
 
     Order.findByIdAndUpdate(orderId, {state: setOrderState(code)}, { useFindAndModify: false, new: true })

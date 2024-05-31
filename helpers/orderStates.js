@@ -9,6 +9,8 @@ export const setOrderState = (code) => {
             return {code: 3, text:"Pedido pronto para retirada"};
         case 4:
             return {code: 4, text: "Concluido"} ;
+        case 5:
+            return { code: 5, text:"Finalizado"};
         case 0:
             return {code: 0, text:"Cancelado"};
         default:

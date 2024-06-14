@@ -7,6 +7,8 @@ import multer from "multer";
 import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import { fileURLToPath } from "url";
 import menuRoutes from "./routes/menu.js";
 import userRoutes from "./routes/users.js";
@@ -27,6 +29,14 @@ app.use(bodyParser.json({ limit : "30mb", extended: true}));
 app.use(bodyParser.urlencoded({ limit : "30mb", extended: true}));
 app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, 'public/assets')));
+
+const server = createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: process.env.ALLOW_SOCKET_URL,
+        methods: ["GET", "POST"],
+    }
+});
 
 //file storage
 const storage = multer.diskStorage({
@@ -52,9 +62,28 @@ const PORT = process.env.PORT || 6001;
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-})
-.then(() => {
-    app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
-})
-.catch((error) => console.log(`${error} -- Did not connect`));
+});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'Erro de conexão com o MongoDB:'));
+db.once('open', () => {
+  console.log('Conexão com o MongoDB estabelecida com sucesso');
+});
+// .then(() => {
+//     app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
+// })
+// .catch((error) => console.log(`${error} -- Did not connect`));
 
+io.on("connection", (socket) => {
+    socket.on("join_admin", (data) => {
+        console.log("Join User Socket Admin", data);
+        socket.join(data);
+    });
+    socket.on("order_created", (data) => {
+        console.log(data)
+        socket.to(data.room).emit("receive_message", data)
+    });
+});
+
+server.listen(PORT, () => {
+    console.log("SERVER IO RUNNING")
+});

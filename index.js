@@ -33,8 +33,7 @@ app.use("/assets", express.static(path.join(__dirname, 'public/assets')));
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: process.env.ALLOW_SOCKET_URL,
-        methods: ["GET", "POST"],
+        origin: "*"
     }
 });
 

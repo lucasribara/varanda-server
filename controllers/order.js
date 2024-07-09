@@ -7,7 +7,7 @@ import { getUserIdFromToken } from "../middleware/auth.js";
 export const getWorkingOrders = async (req, res) => {
     try {       
         const ordersWithUserDetails = await Order.find({'state.code': { $ne: 5 }})
-            .populate('user')
+            .populate('user', 'firstName lastName homeNumber phoneNumber')
             .exec();
 
         res.status(200).json(ordersWithUserDetails);
@@ -20,11 +20,6 @@ export const getWorkingOrders = async (req, res) => {
 export const getUserOrders = async (req, res) => {
     try {
         const userId = req.params.id;
-        // let token = req.header("Authorization");
-        // console.log(userId, " ==== ", getUserIdFromToken(token));
-        // if(userId != getUserIdFromToken(token)) {
-        //     return res.status(403).json({message: "Você não tem permissão para essa ação"});
-        // }
 
         const orders = await Order.find({ user: userId }).sort('-createdAt');
         res.status(200).json(orders);
